@@ -1,16 +1,17 @@
 testsdf
-git filter-branch --env-filter '
-OLD_EMAIL="lamynaals@gmail.com"
-CORRECT_NAME="somesh-SV"
-CORRECT_EMAIL="svsomeshkumar@gmail.com"
-if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]
-then
-    export GIT_COMMITTER_NAME="$CORRECT_NAME"
-    export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"
-fi
-if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]
-then
-    export GIT_AUTHOR_NAME="$CORRECT_NAME"
-    export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"
-fi
-' --tag-name-filter cat -- --branches --tags
+git filter-repo --commit-callback '
+  commit.author_name = b"somesh-SV";
+  commit.author_email = b"svsomeshkumar@gmail.com";
+  commit.committer_name = b"somesh-SV";
+  commit.committer_email = b"svsomeshkumar@gmail.com"
+'
+git filter-branch --commit-filter '
+  if [ "$GIT_AUTHOR_NAME" = "lamynaals@gmail.com" ]; then
+    export GIT_AUTHOR_NAME="somesh-SV";
+    export GIT_AUTHOR_EMAIL="svsomeshkumar@gmail.com";
+    export GIT_COMMITTER_NAME="somesh-SV";
+    export GIT_COMMITTER_EMAIL="svsomeshkumar@gmail.com";
+  fi;
+  git commit-tree "$@";
+' -- --all
+git config --global user.email "svsomeshkumar@gmail.com"
